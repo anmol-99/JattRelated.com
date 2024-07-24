@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Welcome to the E-commerce Store</h1>
+<div class="products">
+    {% for product in products %}
+        <div class="product">
+            <h2><a href="{{ url_for('product', product_id=product.id) }}">{{ product.name }}</a></h2>
+            <p>{{ product.description }}</p>
+            <p>${{ product.price }}</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
