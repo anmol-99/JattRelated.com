@@ -1,6 +1,6 @@
 <!doctype html>
 <html class="js full-height" lang="{{ request.locale.iso_code }}">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -16,7 +16,6 @@
     {%- endunless -%}
 
     <title>{{ shop.name }}</title>
-
     <meta name="description" content="{{ page_description | escape }}">
 
     {% render 'meta-tags' %}
@@ -71,7 +70,6 @@
         --font-body-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
         --font-body-style: {{ settings.type_body_font.style }};
         --font-body-weight: {{ settings.type_body_font.weight }};
-
         --font-heading-family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
         --font-heading-style: {{ settings.type_header_font.style }};
         --font-heading-weight: {{ settings.type_header_font.weight }};
@@ -127,88 +125,71 @@
         --badge-corner-radius: {{ settings.badge_corner_radius | divided_by: 10.0 }}rem;
 
         --spacing-sections-desktop: {{ settings.spacing_sections }}px;
-        --spacing-sections-mobile: {% if settings.spacing_sections < 24 %}{{ settings.spacing_sections }}{% else %}{{ settings.spacing_sections | times: 0.7 | round | at_least: 20 }}{% endif %}px;
+        --spacing-sections-mobile: {% if settings.spacing_sections < 24 %}{{ settings.spacing_sections }}{% else %}{{ settings.spacing_sections | divided_by: 10.0 }}rem{% endif %};
 
-        --grid-desktop-vertical-spacing: {{ settings.spacing_grid_vertical }}px;
-        --grid-desktop-horizontal-spacing: {{ settings.spacing_grid_horizontal }}px;
-        --grid-mobile-vertical-spacing: {{ settings.spacing_grid_vertical | divided_by: 2 }}px;
-        --grid-mobile-horizontal-spacing: {{ settings.spacing_grid_horizontal | divided_by: 2 }}px;
-
-        --text-boxes-border-opacity: {{ settings.text_boxes_border_opacity | divided_by: 100.0 }};
-        --text-boxes-border-width: {{ settings.text_boxes_border_thickness }}px;
-        --text-boxes-radius: {{ settings.text_boxes_radius }}px;
-        --text-boxes-shadow-opacity: {{ settings.text_boxes_shadow_opacity | divided_by: 100.0 }};
-        --text-boxes-shadow-visible: {% if settings.text_boxes_shadow_opacity > 0 %}1{% else %}0{% endif %};
-        --text-boxes-shadow-horizontal-offset: {{ settings.text_boxes_shadow_horizontal_offset }}px;
-        --text-boxes-shadow-vertical-offset: {{ settings.text_boxes_shadow_vertical_offset }}px;
-        --text-boxes-shadow-blur-radius: {{ settings.text_boxes_shadow_blur }}px;
-
-        --buttons-radius: {{ settings.buttons_radius }}px;
-        --buttons-radius-outset: {% if settings.buttons_radius > 0 %}{{ settings.buttons_radius | plus: settings.buttons_border_thickness }}{% else %}0{% endif %}px;
-        --buttons-border-width: {% if settings.buttons_border_opacity > 0 %}{{ settings.buttons_border_thickness }}{% else %}0{% endif %}px;
-        --buttons-border-opacity: {{ settings.buttons_border_opacity | divided_by: 100.0 }};
-        --buttons-shadow-opacity: {{ settings.buttons_shadow_opacity | divided_by: 100.0 }};
-        --buttons-shadow-visible: {% if settings.buttons_shadow_opacity > 0 %}1{% else %}0{% endif %};
-        --buttons-shadow-horizontal-offset: {{ settings.buttons_shadow_horizontal_offset }}px;
-        --buttons-shadow-vertical-offset: {{ settings.buttons_shadow_vertical_offset }}px;
-        --buttons-shadow-blur-radius: {{ settings.buttons_shadow_blur }}px;
-        --buttons-border-offset: {% if settings.buttons_radius > 0 or settings.buttons_shadow_opacity > 0 %}0.3{% else %}0{% endif %}px;
-
-        --inputs-radius: {{ settings.inputs_radius }}px;
-        --inputs-border-width: {{ settings.inputs_border_thickness }}px;
-        --inputs-border-opacity: {{ settings.inputs_border_opacity | divided_by: 100.0 }};
-        --inputs-shadow-opacity: {{ settings.inputs_shadow_opacity | divided_by: 100.0 }};
-        --inputs-shadow-horizontal-offset: {{ settings.inputs_shadow_horizontal_offset }}px;
-        --inputs-margin-offset: {% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_opacity > 0 %}{{ settings.inputs_shadow_vertical_offset | abs }}{% else %}0{% endif %}px;
-        --inputs-shadow-vertical-offset: {{ settings.inputs_shadow_vertical_offset }}px;
-        --inputs-shadow-blur-radius: {{ settings.inputs_shadow_blur }}px;
-        --inputs-radius-outset: {% if settings.inputs_radius > 0 %}{{ settings.inputs_radius | plus: settings.inputs_border_thickness }}{% else %}0{% endif %}px;
-
-        --variant-pills-radius: {{ settings.variant_pills_radius }}px;
-        --variant-pills-border-width: {{ settings.variant_pills_border_thickness }}px;
-        --variant-pills-border-opacity: {{ settings.variant_pills_border_opacity | divided_by: 100.0 }};
-        --variant-pills-shadow-opacity: {{ settings.variant_pills_shadow_opacity | divided_by: 100.0 }};
-        --variant-pills-shadow-horizontal-offset: {{ settings.variant_pills_shadow_horizontal_offset }}px;
-        --variant-pills-shadow-vertical-offset: {{ settings.variant_pills_shadow_vertical_offset }}px;
-        --variant-pills-shadow-blur-radius: {{ settings.variant_pills_shadow_blur }}px;
+        --header-height: {{ settings.header_height }}px;
+        --footer-height: {{ settings.footer_height }}px;
       }
+
+      {% if settings.page_width == '1600' %}
+        @media (min-width: 1600px) {
+          .page-width-container {
+            max-width: {{ settings.page_width }}px;
+          }
+        }
+      {% endif %}
     {% endstyle %}
 
-    {%- unless settings.type_body_font.system? -%}
-      {% comment %}theme-check-disable AssetPreload{% endcomment %}
-      <link rel="preload" as="font" href="{{ settings.type_body_font | font_url }}" type="font/woff2" crossorigin>
-      {% comment %}theme-check-enable AssetPreload{% endcomment %}
-    {%- endunless -%}
-    {%- unless settings.type_header_font.system? -%}
-      {% comment %}theme-check-disable AssetPreload{% endcomment %}
-      <link rel="preload" as="font" href="{{ settings.type_header_font | font_url }}" type="font/woff2" crossorigin>
-      {% comment %}theme-check-enable AssetPreload{% endcomment %}
-    {%- endunless -%}
+    {% script %}
+      var theme_settings = {{ settings | json }};
+      var color_scheme_classes = "{{ scheme_classes | split: ',' | join: ' ' }}";
+    {% endscript>
 
-    {{ 'section-password.css' | asset_url | stylesheet_tag }}
-    {{ 'base.css' | asset_url | stylesheet_tag }}
-    {{ 'component-list-social.css' | asset_url | stylesheet_tag }}
+    {% render 'preload' %}
 
-    <script src="{{ 'global.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'details-modal.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'password-modal.js' | asset_url }}" defer="defer"></script>
-  </head>
+    {%- render 'font-variables' -%}
+</head>
+<body class="template-{{ template }} {{ scheme_classes }}">
+    <header class="site-header">
+        <div class="header-content">
+            <div class="header-logo">
+                <a href="{{ shop.url }}">
+                    <img src="{{ settings.header_logo | image_url: width: 200 }}" alt="{{ shop.name }}">
+                </a>
+            </div>
+            <nav class="header-navigation">
+                <ul>
+                    <li><a href="/collections">Collections</a></li>
+                    <li><a href="/blogs">Blogs</a></li>
+                    <li><a href="/about-us">About Us</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-  <body class="password gradient">
-    <a class="skip-to-content-link button visually-hidden" href="#MainContent">
-      {{ 'accessibility.skip_to_text' | t }}
-    </a>
-
-    {% section 'main-password-header' %}
-
-    <main id="MainContent" class="password-main">
-      {{ content_for_layout }}
+    <main class="main-content">
+        {{ content_for_layout }}
     </main>
-    <footer>
-      {% section 'main-password-footer' %}
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="/privacy-policy">Privacy Policy</a>
+                <a href="/terms-of-service">Terms of Service</a>
+                <a href="/refund-policy">Refund Policy</a>
+            </div>
+            <div class="footer-social">
+                <a href="https://facebook.com/{{ shop.facebook }}" target="_blank">Facebook</a>
+                <a href="https://twitter.com/{{ shop.twitter }}" target="_blank">Twitter</a>
+                <a href="https://instagram.com/{{ shop.instagram }}" target="_blank">Instagram</a>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name }}. All rights reserved.</p>
+            </div>
+        </div>
     </footer>
-    <ul hidden>
-      <li id="a11y-new-window-message">{{ 'accessibility.link_messages.new_window' | t }}</li>
-    </ul>
-  </body>
+
+    {% render 'scripts' %}
+</body>
 </html>
