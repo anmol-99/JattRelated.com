@@ -1,85 +1,87 @@
-from flask import Flask, render_template, url_for, flash, redirect, request, session
-from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
+# E-commerce Store
 
-app = Flask(__name__)
-app.config.from_object('config.Config')
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
+An e-commerce web application built with Flask. This application allows users to register, log in, browse products, add products to their cart, and view their shopping cart.
 
-from models import User, Product, CartItem
-from forms import RegistrationForm, LoginForm
+## Features
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+- User registration and authentication
+- Product listing and detail view
+- Add products to the shopping cart
+- View items in the shopping cart
 
-@app.route('/')
-@app.route('/index')
-def index():
-    products = Product.query.all()
-    return render_template('index.html', products=products)
+## Technologies Used
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password)
-        db.session.add(user)
-        db.session.commit()
-        flash('Your account has been created! You are now able to log in', 'success')
-        return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=form)
+- Python
+- Flask
+- SQLAlchemy
+- Flask-WTF
+- Flask-Login
+- HTML/CSS
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
-            login_user(user, remember=form.remember.data)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('index'))
-        else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
-    return render_template('login.html', title='Login', form=form)
+## Installation
 
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
+1. **Clone the repository:**
 
-@app.route('/product/<int:product_id>')
-def product(product_id):
-    product = Product.query.get_or_404(product_id)
-    return render_template('product.html', title=product.name, product=product)
+    ```bash
+    git clone https://github.com/your-username/ecommerce_store.git
+    cd ecommerce_store
+    ```
 
-@app.route('/cart')
-@login_required
-def cart():
-    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
-    return render_template('cart.html', cart_items=cart_items)
+2. **Set up a virtual environment:**
 
-@app.route('/add_to_cart/<int:product_id>')
-@login_required
-def add_to_cart(product_id):
-    product = Product.query.get_or_404(product_id)
-    cart_item = CartItem(user_id=current_user.id, product_id=product.id)
-    db.session.add(cart_item)
-    db.session.commit()
-    flash('Product added to cart', 'success')
-    return redirect(url_for('cart'))
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    ```
 
-if __name__ == '__main__':
-    app.run(debug=True)
+3. **Install the dependencies:**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. **Create the database:**
+
+    ```bash
+    python
+    >>> from app import db
+    >>> db.create_all()
+    >>> exit()
+    ```
+
+5. **Run the application:**
+
+    ```bash
+    python app.py
+    ```
+
+6. **Open your web browser** and go to `http://127.0.0.1:5000/` to see the application in action.
+
+## Directory Structure
+
+
+## Usage
+
+- **Home Page:** Browse the list of products.
+- **Product Page:** View details of a specific product.
+- **Register:** Create a new user account.
+- **Login:** Log in to an existing user account.
+- **Cart:** View the shopping cart and manage cart items.
+
+## Contributing
+
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature/your-feature-name`.
+3. Make your changes and commit them: `git commit -m 'Add some feature'`.
+4. Push to the branch: `git push origin feature/your-feature-name`.
+5. Submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+Your Name - [your-email@example.com](mailto:your-email@example.com)
+
+Project Link: [https://github.com/your-username/ecommerce_store](https://github.com/your-username/ecommerce_store)
